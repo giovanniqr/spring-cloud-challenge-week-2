@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +42,7 @@ class PagamentoController {
 		return ResponseEntity.created(path).body(new PagamentoDto(salvo));
 	}
 
+	@HystrixCommand(fallbackMethod = "confirmaFallback")
 	@PutMapping("/{id}")
 	PagamentoDto confirma(@PathVariable("id") Long id) {
 		Pagamento pagamento = pagamentoRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -47,6 +50,13 @@ class PagamentoController {
 		pedidoCliente.notificaServicoDePedidoParaMudarStatus(pagamento.getPedidoId(), new MudancaDeStatusDoPedido("pago"));
 		pagamentoRepo.save(pagamento);
 		return new PagamentoDto(pagamento);
+	}
+	
+	PagamentoDto confirmaFallback(@PathVariable("id") Long id) {
+		Pagamento pagamentoFallback = pagamentoRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
+		pagamentoFallback.setStatus(Pagamento.Status.PROCESSANDO);
+		pagamentoRepo.save(pagamentoFallback);
+		return new PagamentoDto(pagamentoFallback);
 	}
 
 	@DeleteMapping("/{id}")

@@ -7,11 +7,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+
 import java.util.List;
 
 @FeignClient(name = "monolito")
 public interface PedidoClienteComFeign {
 
+	
     @PutMapping("/pedidos/{idDoPedido}/status")
     void notificaServicoDePedidoParaMudarStatus(@PathVariable("idDoPedido") Long id,
                                                 @RequestBody MudancaDeStatusDoPedido body);
