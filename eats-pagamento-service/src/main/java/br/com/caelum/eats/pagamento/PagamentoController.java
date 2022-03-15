@@ -55,6 +55,7 @@ class PagamentoController {
 	PagamentoDto confirmaFallback(@PathVariable("id") Long id) {
 		Pagamento pagamentoFallback = pagamentoRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 		pagamentoFallback.setStatus(Pagamento.Status.PROCESSANDO);
+		pedidoCliente.notificaServicoDePedidoParaMudarStatus(pagamentoFallback.getPedidoId(), new MudancaDeStatusDoPedido("pago"));
 		pagamentoRepo.save(pagamentoFallback);
 		return new PagamentoDto(pagamentoFallback);
 	}
