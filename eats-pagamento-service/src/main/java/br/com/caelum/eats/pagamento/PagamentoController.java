@@ -19,6 +19,7 @@ class PagamentoController {
 	private PagamentoRepository pagamentoRepo;
 	private PedidoClienteComFeign pedidoCliente;
 
+	@HystrixCommand(threadPoolKey = "listaThreadPool")
 	@GetMapping
 	ResponseEntity<List<PagamentoDto>> lista() {
 		return ResponseEntity.ok(pagamentoRepo.findAll()
@@ -42,7 +43,7 @@ class PagamentoController {
 		return ResponseEntity.created(path).body(new PagamentoDto(salvo));
 	}
 
-	@HystrixCommand(fallbackMethod = "confirmaFallback")
+	@HystrixCommand(fallbackMethod = "confirmaFallback", threadPoolKey = "confirmaThreadPool")
 	@PutMapping("/{id}")
 	PagamentoDto confirma(@PathVariable("id") Long id) {
 		Pagamento pagamento = pagamentoRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
