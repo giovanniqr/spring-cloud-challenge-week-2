@@ -24,8 +24,8 @@ public class AuthorizationServerConfigurer extends AuthorizationServerConfigurer
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
-			.withClient("api-gateway")
-			.secret(passwordEncoder.encode("api-gatewaypwd"))
+			.withClient("zuul")
+			.secret(passwordEncoder.encode("zuulpwd"))
 			.authorizedGrantTypes("password")
 			.scopes("web");
 			
